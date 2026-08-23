@@ -1,0 +1,29 @@
+﻿# Build directories
+build/
+bin/
+lib/
+out/
+.cache/
+
+# IDE / Editor files
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# Compiled objects & libraries
+*.obj
+*.o
+*.lib
+*.a
+*.exp
+*.ilk
+*.pdb
+*.exe
+*.dll
+
+# Qt generated
+*_autogen/
+.rcc/
+.qmake.stash
