@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.22)
 project(GamepadMapper VERSION 1.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -136,3 +136,22 @@ add_executable(GamepadMapperDemo
     "examples/game_demo/main.cpp"
 )
 target_link_libraries(GamepadMapperDemo PRIVATE GamepadMapperLib)
+
+# C-ABI Shared DLL for Python (ctypes) & external bindings
+add_library(GamepadMapper SHARED
+    "src/GamepadMapperC.cpp"
+    "include/GamepadMapper/GamepadMapperC.h"
+)
+target_include_directories(GamepadMapper PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>"
+)
+target_compile_definitions(GamepadMapper PRIVATE GAMEPADMAPPER_EXPORTS)
+target_link_libraries(GamepadMapper PRIVATE
+    GamepadMapperLib
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    SDL3::SDL3-shared
+)
+
