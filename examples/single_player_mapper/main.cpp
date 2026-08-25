@@ -1,8 +1,9 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #include <QApplication>
 #include <QStyleFactory>
 #include <QPalette>
 #include <QColor>
+#include <QIcon>
 
 #include "GamepadMapper/GamepadManager.h"
 #include "GamepadMapper/SingleGamepadConfigDialog.h"
@@ -11,6 +12,7 @@ int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("SingleGamepadMapperApp"));
     app.setOrganizationName(QStringLiteral("GamepadMapper"));
+    app.setWindowIcon(QIcon(QStringLiteral(":/icons/app_icon.png")));
 
     // Set Modern Dark Theme
     app.setStyle(QStyleFactory::create(QStringLiteral("Fusion")));

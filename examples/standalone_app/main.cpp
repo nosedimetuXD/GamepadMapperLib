@@ -1,12 +1,14 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #include <QApplication>
 #include <QStyleFactory>
+#include <QIcon>
 #include "GamepadMapper/GamepadManager.h"
 #include "GamepadMapper/GamepadConfigDialog.h"
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName("Gamepad Mapper");
+    app.setWindowIcon(QIcon(QStringLiteral(":/icons/app_icon.png")));
     app.setStyle(QStyleFactory::create("Fusion"));
 
     auto& manager = GamepadMapper::GamepadManager::Instance();

@@ -234,29 +234,42 @@ void PlayerControlPreview::paintEvent(QPaintEvent* event) {
     QFrame::paintEvent(event);
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
-    const QPointF center = rect().center();
+
+    const QRectF r = rect();
+    const QPointF center = r.center();
+
+    float scale = std::min(r.width() / 520.0f, r.height() / 380.0f);
+    if (scale < 0.6f) scale = 0.6f;
+
+    p.save();
+    p.translate(center);
+    p.scale(scale, scale);
+
+    const QPointF origin(0, 0);
 
     switch (controller_type) {
     case Core::HID::NpadStyleIndex::Handheld:
-        DrawHandheldController(p, center);
+        DrawHandheldController(p, origin);
         break;
     case Core::HID::NpadStyleIndex::JoyconDual:
-        DrawDualController(p, center);
+        DrawDualController(p, origin);
         break;
     case Core::HID::NpadStyleIndex::JoyconLeft:
-        DrawLeftController(p, center);
+        DrawLeftController(p, origin);
         break;
     case Core::HID::NpadStyleIndex::JoyconRight:
-        DrawRightController(p, center);
+        DrawRightController(p, origin);
         break;
     case Core::HID::NpadStyleIndex::GameCube:
-        DrawGCController(p, center);
+        DrawGCController(p, origin);
         break;
     case Core::HID::NpadStyleIndex::Fullkey:
     default:
-        DrawProController(p, center);
+        DrawProController(p, origin);
         break;
     }
+
+    p.restore();
 }
 
 void PlayerControlPreview::DrawLeftController(QPainter& p, const QPointF center) {

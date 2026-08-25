@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #include "GamepadMapper/SingleGamepadConfigDialog.h"
 #include "GamepadMapper/GamepadManager.h"
 #include "ui/configure_single_player.h"
@@ -9,6 +9,9 @@
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QTimer>
+#include <QIcon>
+#include <QShortcut>
+#include <QKeySequence>
 
 namespace GamepadMapper {
 
@@ -16,10 +19,23 @@ SingleGamepadConfigDialog::SingleGamepadConfigDialog(QWidget* parent,
                                                      ControllerLayoutStyle preferred_style)
     : QDialog(parent) {
     setWindowTitle(tr("Configuración y Remapeo de Mando"));
-    setMinimumSize(950, 650);
+    setWindowIcon(QIcon(QStringLiteral(":/icons/app_icon.png")));
+    setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+    resize(1200, 800);
+    setMinimumSize(950, 600);
+
+    // F11 Shortcut for toggling Fullscreen mode
+    auto* fullscreen_shortcut = new QShortcut(QKeySequence(Qt::Key_F11), this);
+    connect(fullscreen_shortcut, &QShortcut::activated, this, [this] {
+        if (isFullScreen()) {
+            showNormal();
+        } else {
+            showFullScreen();
+        }
+    });
 
     auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(10, 10, 10, 10);
+    layout->setContentsMargins(12, 12, 12, 12);
 
     auto& manager = GamepadManager::Instance();
     manager.Initialize();

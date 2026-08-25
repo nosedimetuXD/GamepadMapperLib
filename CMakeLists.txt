@@ -70,6 +70,7 @@ file(GLOB_RECURSE PUBLIC_HEADERS
 set(RESOURCES
     "res/icons/controller/controller.qrc"
     "res/icons/overlay/overlay.qrc"
+    "res/app_icon.qrc"
 )
 
 add_library(GamepadMapperLib STATIC
@@ -129,20 +130,16 @@ endif()
 # Standalone Multi-Player Executable Application
 add_executable(GamepadMapperApp WIN32
     "examples/standalone_app/main.cpp"
+    "res/app_icon.rc"
 )
 target_link_libraries(GamepadMapperApp PRIVATE GamepadMapperLib)
 
 # Single Player Remapper Executable Application (FC 26 style)
 add_executable(SingleGamepadMapperApp WIN32
     "examples/single_player_mapper/main.cpp"
+    "res/app_icon.rc"
 )
 target_link_libraries(SingleGamepadMapperApp PRIVATE GamepadMapperLib)
-
-# Polling Console Demo
-add_executable(GamepadMapperDemo
-    "examples/game_demo/main.cpp"
-)
-target_link_libraries(GamepadMapperDemo PRIVATE GamepadMapperLib)
 
 # C-ABI Shared DLL for Python (ctypes) & external bindings
 add_library(GamepadMapper SHARED

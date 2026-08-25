@@ -8,15 +8,30 @@
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QTimer>
+#include <QIcon>
+#include <QShortcut>
+#include <QKeySequence>
 
 namespace GamepadMapper {
 
 GamepadConfigDialog::GamepadConfigDialog(QWidget* parent) : QDialog(parent) {
     setWindowTitle(tr("Configuración de Mandos y Controles"));
-    setMinimumSize(850, 600);
+    setWindowIcon(QIcon(QStringLiteral(":/icons/app_icon.png")));
+    setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+    resize(1200, 800);
+    setMinimumSize(900, 600);
+
+    auto* fullscreen_shortcut = new QShortcut(QKeySequence(Qt::Key_F11), this);
+    connect(fullscreen_shortcut, &QShortcut::activated, this, [this] {
+        if (isFullScreen()) {
+            showNormal();
+        } else {
+            showFullScreen();
+        }
+    });
 
     auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(8, 8, 8, 8);
+    layout->setContentsMargins(10, 10, 10, 10);
 
     auto& manager = GamepadManager::Instance();
     manager.Initialize();
