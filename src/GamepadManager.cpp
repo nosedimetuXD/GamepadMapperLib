@@ -1,6 +1,7 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #include "GamepadMapper/GamepadManager.h"
 #include "GamepadMapper/GamepadConfigDialog.h"
+#include "GamepadMapper/SingleGamepadConfigDialog.h"
 
 #include <chrono>
 #include <thread>
@@ -261,6 +262,22 @@ InputCommon::InputSubsystem* GamepadManager::GetInputSubsystem() {
 
 Core::HID::HIDCore* GamepadManager::GetHIDCore() {
     return impl->hid_core.get();
+}
+
+bool GamepadManager::OpenConfigDialog(void* parent_window) {
+    if (!impl->initialized) {
+        Initialize();
+    }
+    GamepadConfigDialog dialog(static_cast<QWidget*>(parent_window));
+    return dialog.exec() == QDialog::Accepted;
+}
+
+bool GamepadManager::OpenSingleConfigDialog(void* parent_window) {
+    if (!impl->initialized) {
+        Initialize();
+    }
+    SingleGamepadConfigDialog dialog(static_cast<QWidget*>(parent_window));
+    return dialog.exec() == QDialog::Accepted;
 }
 
 } // namespace GamepadMapper

@@ -1,4 +1,4 @@
-﻿# GamepadMapperLib
+# GamepadMapperLib
 
 **GamepadMapperLib** is a standalone, modern C++20 gamepad and controller mapping library with an embeddable Qt GUI configuration dialog and multi-driver hardware abstraction (SDL3, Joy-Con, Keyboard/Mouse, Virtual Pads).
 
@@ -21,20 +21,22 @@ Extracted and modularized from the **Eden** emulator input subsystem.
 
 ```
 GamepadMapperLib/
-├── include/GamepadMapper/     # Clean Public C++ API
-│   ├── GamepadManager.h       # Core input polling and management
-│   ├── GamepadTypes.h         # Enums (Button, Stick, Trigger) and State structs
-│   └── GamepadConfigDialog.h  # Embeddable Qt Modal Dialog
-├── src/                       # Subsystem & Drivers
-│   ├── common/                # Math, settings, logging, time, CPU features
+├── include/GamepadMapper/           # Clean Public C++ API
+│   ├── GamepadManager.h             # Core input polling and management
+│   ├── GamepadTypes.h               # Enums (Button, Stick, Trigger) and State structs
+│   ├── GamepadConfigDialog.h        # Multi-player Qt Modal Dialog
+│   └── SingleGamepadConfigDialog.h  # Single-Player Remapper Dialog (FC 26 style)
+├── src/                             # Subsystem & Drivers
+│   ├── common/                      # Math, settings, logging, time, CPU features
 │   ├── core/
-│   │   ├── hid_core/          # Emulated controller logic, calibration, styles
-│   │   └── input_common/      # SDL3 driver, Joy-Con driver, Keyboard/Mouse
-│   └── ui/                    # Qt configuration forms, controller preview widget
+│   │   ├── hid_core/                # Emulated controller logic, calibration, styles
+│   │   └── input_common/            # SDL3 driver, Joy-Con driver, Keyboard/Mouse
+│   └── ui/                          # Qt configuration forms, single player & preview
 ├── examples/
-│   ├── standalone_app/        # Standalone GamepadMapperApp GUI executable
-│   └── game_demo/             # Console 60 FPS game polling demo
-├── res/                       # Controller icons & overlay QRC assets
+│   ├── single_player_mapper/        # SingleGamepadMapperApp (FC 26 style single controller)
+│   ├── standalone_app/              # Multi-player GamepadMapperApp GUI executable
+│   └── game_demo/                   # Console 60 FPS game polling demo
+├── res/                             # Controller icons & overlay QRC assets
 ├── CMakeLists.txt
 └── build.bat
 ```

@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #pragma once
 
 #include <memory>
@@ -63,6 +63,10 @@ public:
     /// Direct access to internal subsystems if needed
     InputCommon::InputSubsystem* GetInputSubsystem();
     Core::HID::HIDCore* GetHIDCore();
+
+    /// Convenience helpers to open Qt config dialogs
+    bool OpenConfigDialog(void* parent_window = nullptr);
+    bool OpenSingleConfigDialog(void* parent_window = nullptr);
 
 private:
     GamepadManager();

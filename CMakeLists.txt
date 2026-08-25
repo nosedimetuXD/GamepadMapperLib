@@ -81,6 +81,7 @@ add_library(GamepadMapperLib STATIC
     ${RESOURCES}
     "src/GamepadManager.cpp"
     "src/GamepadConfigDialog.cpp"
+    "src/SingleGamepadConfigDialog.cpp"
 )
 
 target_include_directories(GamepadMapperLib PUBLIC
@@ -125,11 +126,17 @@ if(MSVC)
     )
 endif()
 
-# Standalone Executable Application
+# Standalone Multi-Player Executable Application
 add_executable(GamepadMapperApp WIN32
     "examples/standalone_app/main.cpp"
 )
 target_link_libraries(GamepadMapperApp PRIVATE GamepadMapperLib)
+
+# Single Player Remapper Executable Application (FC 26 style)
+add_executable(SingleGamepadMapperApp WIN32
+    "examples/single_player_mapper/main.cpp"
+)
+target_link_libraries(SingleGamepadMapperApp PRIVATE GamepadMapperLib)
 
 # Polling Console Demo
 add_executable(GamepadMapperDemo
