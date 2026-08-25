@@ -98,6 +98,7 @@ add_library(GamepadMapperLib STATIC
     "src/GamepadManager.cpp"
     "src/GamepadConfigDialog.cpp"
     "src/SingleGamepadConfigDialog.cpp"
+    "src/SingleSwitchConfigDialog.cpp"
 )
 
 target_include_directories(GamepadMapperLib PUBLIC
@@ -155,6 +156,13 @@ add_executable(SingleGamepadMapperApp WIN32
     "res/app_icon.rc"
 )
 target_link_libraries(SingleGamepadMapperApp PRIVATE GamepadMapperLib)
+
+# Single Switch Remapper Executable Application (Switch Target)
+add_executable(SingleSwitchMapperApp WIN32
+    "examples/single_switch_mapper/main.cpp"
+    "res/app_icon.rc"
+)
+target_link_libraries(SingleSwitchMapperApp PRIVATE GamepadMapperLib)
 
 # C-ABI Shared DLL for Python (ctypes) & external bindings
 add_library(GamepadMapper SHARED
