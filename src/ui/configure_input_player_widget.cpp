@@ -867,10 +867,22 @@ void PlayerControlPreview::DrawProController(QPainter& p, const QPointF center) 
     // Face buttons text
     p.setPen(colors.transparent);
     p.setBrush(colors.font);
-    DrawSymbol(p, face_center + QPoint(face_distance, 0), Symbol::A, text_size);
-    DrawSymbol(p, face_center + QPoint(0, face_distance), Symbol::B, text_size);
-    DrawSymbol(p, face_center + QPoint(0, -face_distance), Symbol::X, text_size);
-    DrawSymbol(p, face_center + QPoint(-face_distance, 1), Symbol::Y, text_size);
+    if (visual_style == VisualLayoutStyle::PlayStation) {
+        DrawSymbol(p, face_center + QPoint(0, face_distance), Symbol::PS_Cross, text_size);
+        DrawSymbol(p, face_center + QPoint(face_distance, 0), Symbol::PS_Circle, text_size);
+        DrawSymbol(p, face_center + QPoint(-face_distance, 0), Symbol::PS_Square, text_size);
+        DrawSymbol(p, face_center + QPoint(0, -face_distance), Symbol::PS_Triangle, text_size);
+    } else if (visual_style == VisualLayoutStyle::Xbox) {
+        DrawSymbol(p, face_center + QPoint(0, face_distance), Symbol::A, text_size);
+        DrawSymbol(p, face_center + QPoint(face_distance, 0), Symbol::B, text_size);
+        DrawSymbol(p, face_center + QPoint(-face_distance, 0), Symbol::X, text_size);
+        DrawSymbol(p, face_center + QPoint(0, -face_distance), Symbol::Y, text_size);
+    } else {
+        DrawSymbol(p, face_center + QPoint(face_distance, 0), Symbol::A, text_size);
+        DrawSymbol(p, face_center + QPoint(0, face_distance), Symbol::B, text_size);
+        DrawSymbol(p, face_center + QPoint(0, -face_distance), Symbol::X, text_size);
+        DrawSymbol(p, face_center + QPoint(-face_distance, 1), Symbol::Y, text_size);
+    }
 
     // D-pad buttons
     const QPointF dpad_position = center + QPoint(-61, 0);
@@ -886,8 +898,16 @@ void PlayerControlPreview::DrawProController(QPainter& p, const QPointF center) 
     DrawTriggerButton(p, center + QPoint(210, -120), Direction::Right, button_values[ZR]);
     p.setPen(colors.transparent);
     p.setBrush(colors.font);
-    DrawSymbol(p, center + QPoint(-210, -120), Symbol::ZL, 1.5f);
-    DrawSymbol(p, center + QPoint(210, -120), Symbol::ZR, 1.5f);
+    if (visual_style == VisualLayoutStyle::PlayStation) {
+        DrawSymbol(p, center + QPoint(-210, -120), Symbol::PS_L2, 1.5f);
+        DrawSymbol(p, center + QPoint(210, -120), Symbol::PS_R2, 1.5f);
+    } else if (visual_style == VisualLayoutStyle::Xbox) {
+        DrawSymbol(p, center + QPoint(-210, -120), Symbol::XB_LT, 1.5f);
+        DrawSymbol(p, center + QPoint(210, -120), Symbol::XB_RT, 1.5f);
+    } else {
+        DrawSymbol(p, center + QPoint(-210, -120), Symbol::ZL, 1.5f);
+        DrawSymbol(p, center + QPoint(210, -120), Symbol::ZR, 1.5f);
+    }
 
     // Minus and Plus buttons
     p.setPen(colors.outline);
@@ -2928,35 +2948,36 @@ void PlayerControlPreview::DrawSymbol(QPainter& p, const QPointF center, Symbol 
         p.drawPolygon(charging_icon.data(), static_cast<int>(charging_icon.size()));
         break;
     case Symbol::PS_Cross: {
-        QPen pen(QColor(110, 170, 255), 2.2f);
+        QPen pen(QColor(110, 170, 255), 2.5f * icon_size);
         p.setPen(pen);
-        constexpr float d = 3.2f;
+        const float d = 4.0f * icon_size;
         p.drawLine(center + QPointF(-d, -d), center + QPointF(d, d));
         p.drawLine(center + QPointF(-d, d), center + QPointF(d, -d));
         break;
     }
     case Symbol::PS_Circle: {
-        QPen pen(QColor(255, 90, 90), 2.0f);
+        QPen pen(QColor(255, 90, 90), 2.2f * icon_size);
         p.setPen(pen);
         p.setBrush(Qt::NoBrush);
-        p.drawEllipse(center, 3.8f, 3.8f);
+        p.drawEllipse(center, 4.8f * icon_size, 4.8f * icon_size);
         break;
     }
     case Symbol::PS_Square: {
-        QPen pen(QColor(255, 130, 220), 2.0f);
+        QPen pen(QColor(255, 130, 220), 2.2f * icon_size);
         p.setPen(pen);
         p.setBrush(Qt::NoBrush);
-        p.drawRect(QRectF(center.x() - 3.4f, center.y() - 3.4f, 6.8f, 6.8f));
+        const float s = 8.6f * icon_size;
+        p.drawRect(QRectF(center.x() - s/2, center.y() - s/2, s, s));
         break;
     }
     case Symbol::PS_Triangle: {
-        QPen pen(QColor(60, 220, 130), 2.0f);
+        QPen pen(QColor(60, 220, 130), 2.2f * icon_size);
         p.setPen(pen);
         p.setBrush(Qt::NoBrush);
         QPointF pts[3] = {
-            center + QPointF(0, -4.2f),
-            center + QPointF(-3.8f, 3.2f),
-            center + QPointF(3.8f, 3.2f)
+            center + QPointF(0, -5.2f * icon_size),
+            center + QPointF(-4.8f * icon_size, 3.8f * icon_size),
+            center + QPointF(4.8f * icon_size, 3.8f * icon_size)
         };
         p.drawPolygon(pts, 3);
         break;
@@ -2969,8 +2990,8 @@ void PlayerControlPreview::DrawSymbol(QPainter& p, const QPointF center, Symbol 
                        (symbol == Symbol::PS_R2) ? QStringLiteral("R2") :
                        (symbol == Symbol::XB_LT) ? QStringLiteral("LT") : QStringLiteral("RT");
         p.setPen(colors.font);
-        SetTextFont(p, 5.0f);
-        p.drawText(QRectF(center.x() - 10, center.y() - 6, 20, 12), Qt::AlignCenter, text);
+        SetTextFont(p, 5.0f * icon_size);
+        p.drawText(QRectF(center.x() - 15 * icon_size, center.y() - 10 * icon_size, 30 * icon_size, 20 * icon_size), Qt::AlignCenter, text);
         break;
     }
     }
