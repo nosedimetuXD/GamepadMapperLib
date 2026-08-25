@@ -5,9 +5,24 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Qt6 Configuration
-if(NOT Qt6_DIR AND EXISTS "C:/Qt/6.8.2/msvc2022_64/lib/cmake/Qt6")
-    list(PREPEND CMAKE_PREFIX_PATH "C:/Qt/6.8.2/msvc2022_64")
+# Dynamic Qt6 Configuration
+if(NOT Qt6_DIR AND NOT CMAKE_PREFIX_PATH)
+    if(DEFINED ENV{QTDIR})
+        list(PREPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
+    endif()
+    # Search common Qt installation directories automatically
+    file(GLOB QT_CANDIDATES
+        "C:/Qt/6.*/msvc*_64"
+        "D:/Qt/6.*/msvc*_64"
+        "C:/Qt/Qt6.*/msvc*_64"
+        "C:/Qt/*_msvc*_64"
+    )
+    if(QT_CANDIDATES)
+        list(SORT QT_CANDIDATES ORDER DESCENDING)
+        list(GET QT_CANDIDATES 0 LATEST_QT)
+        list(PREPEND CMAKE_PREFIX_PATH "${LATEST_QT}")
+        message(STATUS "Auto-detected Qt6 at: ${LATEST_QT}")
+    endif()
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
