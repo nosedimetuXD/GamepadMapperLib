@@ -2,6 +2,7 @@
 #include "GamepadMapper/GamepadMapperC.h"
 #include "GamepadMapper/GamepadManager.h"
 #include "GamepadMapper/GamepadConfigDialog.h"
+#include "GamepadMapper/SingleGamepadConfigDialog.h"
 
 #include <QApplication>
 #include <QStyleFactory>
@@ -138,6 +139,12 @@ bool gamepad_load_profile(int player, const char* profile_name) {
 bool gamepad_show_config_dialog(void* parent_window) {
     EnsureQtApp();
     GamepadMapper::GamepadConfigDialog dialog(static_cast<QWidget*>(parent_window));
+    return dialog.exec() == QDialog::Accepted;
+}
+
+bool gamepad_show_single_config_dialog(void* parent_window) {
+    EnsureQtApp();
+    GamepadMapper::SingleGamepadConfigDialog dialog(static_cast<QWidget*>(parent_window));
     return dialog.exec() == QDialog::Accepted;
 }
 
