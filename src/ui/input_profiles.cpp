@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #include "input_profiles.h"
 #include "qt_config.h"
 
@@ -10,7 +10,10 @@
 namespace {
 
 QString GetInputProfilesPath() {
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/input";
+    const QString generic_data = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    const QString path = generic_data + "/GamepadMapper/input";
+    QDir().mkpath(path);
+    return path;
 }
 
 bool ProfileExistsInFilesystem(std::string_view profile_name) {

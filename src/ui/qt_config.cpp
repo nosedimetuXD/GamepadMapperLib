@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #include "qt_config.h"
 #include "core/input_common/main.h"
 #include <QStandardPaths>
@@ -48,13 +48,19 @@ const std::array<int, 2> QtConfig::default_ringcon_analogs = {
     0, 0
 };
 
+static QString GetConfigDirectory() {
+    const QString generic_data = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    const QString config_dir = generic_data + "/GamepadMapper";
+    QDir().mkpath(config_dir + "/input");
+    return config_dir;
+}
+
 QtConfig::QtConfig(const std::string& config_name, ConfigType config_type)
     : type(config_type) {
-    const QString app_data = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(app_data + "/input");
-    QString path = app_data + "/" + QString::fromStdString(config_name) + ".ini";
+    const QString config_dir = GetConfigDirectory();
+    QString path = config_dir + "/" + QString::fromStdString(config_name) + ".ini";
     if (config_type == ConfigType::InputProfile) {
-        path = app_data + "/input/" + QString::fromStdString(config_name) + ".ini";
+        path = config_dir + "/input/" + QString::fromStdString(config_name) + ".ini";
     }
     settings = std::make_unique<QSettings>(path, QSettings::IniFormat);
 }

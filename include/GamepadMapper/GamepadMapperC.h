@@ -107,6 +107,7 @@ typedef struct {
 GAMEPAD_API bool gamepad_initialize(void);
 GAMEPAD_API void gamepad_shutdown(void);
 GAMEPAD_API void gamepad_update(void);
+GAMEPAD_API void gamepad_reload(void);
 
 // Polling
 GAMEPAD_API bool gamepad_is_connected(int player);

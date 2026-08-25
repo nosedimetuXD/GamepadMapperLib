@@ -35,6 +35,10 @@ void gamepad_update(void) {
     GamepadMapper::GamepadManager::Instance().Update();
 }
 
+void gamepad_reload(void) {
+    GamepadMapper::GamepadManager::Instance().Reload();
+}
+
 bool gamepad_is_connected(int player) {
     return GamepadMapper::GamepadManager::Instance().IsConnected(player);
 }

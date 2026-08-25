@@ -83,6 +83,18 @@ void GamepadManager::Update() {
     impl->input_subsystem->PumpEvents();
 }
 
+void GamepadManager::Reload() {
+    if (!impl->initialized) {
+        return;
+    }
+    if (impl->qt_config) {
+        impl->qt_config->ReloadAllValues();
+    }
+    if (impl->hid_core) {
+        impl->hid_core->ReloadInputDevices();
+    }
+}
+
 bool GamepadManager::IsConnected(int player) const {
     if (!impl->initialized || player < 0 || player >= 8) {
         return false;
@@ -99,7 +111,22 @@ ControllerType GamepadManager::GetType(int player) const {
     if (!controller) {
         return ControllerType::ProController;
     }
-    return static_cast<ControllerType>(controller->GetNpadStyleIndex());
+    switch (controller->GetNpadStyleIndex()) {
+    case Core::HID::NpadStyleIndex::Fullkey:
+        return ControllerType::ProController;
+    case Core::HID::NpadStyleIndex::JoyconDual:
+        return ControllerType::DualJoycon;
+    case Core::HID::NpadStyleIndex::JoyconLeft:
+        return ControllerType::LeftJoycon;
+    case Core::HID::NpadStyleIndex::JoyconRight:
+        return ControllerType::RightJoycon;
+    case Core::HID::NpadStyleIndex::Handheld:
+        return ControllerType::Handheld;
+    case Core::HID::NpadStyleIndex::GameCube:
+        return ControllerType::GameCube;
+    default:
+        return ControllerType::ProController;
+    }
 }
 
 bool GamepadManager::IsButtonPressed(int player, Button button) const {
@@ -158,12 +185,18 @@ TriggerState GamepadManager::GetTrigger(int player, Trigger trigger) const {
     if (!controller || !controller->IsConnected()) {
         return {};
     }
+    const auto npad = controller->GetNpadButtons();
+    const bool btn_pressed = (trigger == Trigger::Right) ? bool(npad.zr) : bool(npad.zl);
+
     const auto triggers = controller->GetTriggers();
     const auto val = (trigger == Trigger::Right) ? triggers.right : triggers.left;
-    const float norm_val = static_cast<float>(val) / 32767.0f;
+    float norm_val = static_cast<float>(val) / 32767.0f;
+    if (btn_pressed && norm_val == 0.0f) {
+        norm_val = 1.0f;
+    }
     return TriggerState{
         .value = norm_val,
-        .pressed = (norm_val > 0.5f),
+        .pressed = btn_pressed || (norm_val > 0.5f),
     };
 }
 

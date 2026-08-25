@@ -31,6 +31,9 @@ public:
     /// Update controller states (call once per frame)
     void Update();
 
+    /// Reload all configurations from disk and refresh controller devices
+    void Reload();
+
     /// Check if player (0..7) is connected
     [[nodiscard]] bool IsConnected(int player) const;
 
