@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: Copyright 2026 Eden Emulator Project
+// SPDX-FileCopyrightText: Copyright 2026 Eden Emulator Project
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // SPDX-FileCopyrightText: Copyright 2020 yuzu Emulator Project
@@ -35,6 +35,11 @@ void PlayerControlPreview::SetController(Core::HID::EmulatedController* controll
     };
     callback_key = controller->SetCallback(engine_callback);
     ControllerUpdate(Core::HID::ControllerTriggerType::All);
+}
+
+void PlayerControlPreview::SetVisualLayoutStyle(VisualLayoutStyle style) {
+    visual_style = style;
+    update();
 }
 
 void PlayerControlPreview::UnloadController() {
@@ -730,10 +735,22 @@ void PlayerControlPreview::DrawHandheldController(QPainter& p, const QPointF cen
     // Face buttons text
     p.setPen(colors.transparent);
     p.setBrush(colors.font);
-    DrawSymbol(p, face_center + QPointF(face_distance, 0), Symbol::A, text_size);
-    DrawSymbol(p, face_center + QPointF(0, face_distance), Symbol::B, text_size);
-    DrawSymbol(p, face_center + QPointF(0, -face_distance), Symbol::X, text_size);
-    DrawSymbol(p, face_center + QPointF(-face_distance, 1), Symbol::Y, text_size);
+    if (visual_style == VisualLayoutStyle::PlayStation) {
+        DrawSymbol(p, face_center + QPointF(0, face_distance), Symbol::PS_Cross, text_size);
+        DrawSymbol(p, face_center + QPointF(face_distance, 0), Symbol::PS_Circle, text_size);
+        DrawSymbol(p, face_center + QPointF(-face_distance, 0), Symbol::PS_Square, text_size);
+        DrawSymbol(p, face_center + QPointF(0, -face_distance), Symbol::PS_Triangle, text_size);
+    } else if (visual_style == VisualLayoutStyle::Xbox) {
+        DrawSymbol(p, face_center + QPointF(0, face_distance), Symbol::A, text_size);
+        DrawSymbol(p, face_center + QPointF(face_distance, 0), Symbol::B, text_size);
+        DrawSymbol(p, face_center + QPointF(-face_distance, 0), Symbol::X, text_size);
+        DrawSymbol(p, face_center + QPointF(0, -face_distance), Symbol::Y, text_size);
+    } else {
+        DrawSymbol(p, face_center + QPointF(face_distance, 0), Symbol::A, text_size);
+        DrawSymbol(p, face_center + QPointF(0, face_distance), Symbol::B, text_size);
+        DrawSymbol(p, face_center + QPointF(0, -face_distance), Symbol::X, text_size);
+        DrawSymbol(p, face_center + QPointF(-face_distance, 1), Symbol::Y, text_size);
+    }
 
     // D-pad constants
     const QPointF dpad_center = center + QPoint(-171, 8);
@@ -765,8 +782,16 @@ void PlayerControlPreview::DrawHandheldController(QPainter& p, const QPointF cen
     DrawTriggerButton(p, center + QPoint(210, -120), Direction::Right, button_values[ZR]);
     p.setPen(colors.transparent);
     p.setBrush(colors.font);
-    DrawSymbol(p, center + QPoint(-210, -120), Symbol::ZL, 1.5f);
-    DrawSymbol(p, center + QPoint(210, -120), Symbol::ZR, 1.5f);
+    if (visual_style == VisualLayoutStyle::PlayStation) {
+        DrawSymbol(p, center + QPoint(-210, -120), Symbol::PS_L2, 1.5f);
+        DrawSymbol(p, center + QPoint(210, -120), Symbol::PS_R2, 1.5f);
+    } else if (visual_style == VisualLayoutStyle::Xbox) {
+        DrawSymbol(p, center + QPoint(-210, -120), Symbol::XB_LT, 1.5f);
+        DrawSymbol(p, center + QPoint(210, -120), Symbol::XB_RT, 1.5f);
+    } else {
+        DrawSymbol(p, center + QPoint(-210, -120), Symbol::ZL, 1.5f);
+        DrawSymbol(p, center + QPoint(210, -120), Symbol::ZR, 1.5f);
+    }
 
     // Minus and Plus button
     p.setPen(colors.outline);
@@ -2902,6 +2927,52 @@ void PlayerControlPreview::DrawSymbol(QPainter& p, const QPointF center, Symbol 
         }
         p.drawPolygon(charging_icon.data(), static_cast<int>(charging_icon.size()));
         break;
+    case Symbol::PS_Cross: {
+        QPen pen(QColor(110, 170, 255), 2.2f);
+        p.setPen(pen);
+        constexpr float d = 3.2f;
+        p.drawLine(center + QPointF(-d, -d), center + QPointF(d, d));
+        p.drawLine(center + QPointF(-d, d), center + QPointF(d, -d));
+        break;
+    }
+    case Symbol::PS_Circle: {
+        QPen pen(QColor(255, 90, 90), 2.0f);
+        p.setPen(pen);
+        p.setBrush(Qt::NoBrush);
+        p.drawEllipse(center, 3.8f, 3.8f);
+        break;
+    }
+    case Symbol::PS_Square: {
+        QPen pen(QColor(255, 130, 220), 2.0f);
+        p.setPen(pen);
+        p.setBrush(Qt::NoBrush);
+        p.drawRect(QRectF(center.x() - 3.4f, center.y() - 3.4f, 6.8f, 6.8f));
+        break;
+    }
+    case Symbol::PS_Triangle: {
+        QPen pen(QColor(60, 220, 130), 2.0f);
+        p.setPen(pen);
+        p.setBrush(Qt::NoBrush);
+        QPointF pts[3] = {
+            center + QPointF(0, -4.2f),
+            center + QPointF(-3.8f, 3.2f),
+            center + QPointF(3.8f, 3.2f)
+        };
+        p.drawPolygon(pts, 3);
+        break;
+    }
+    case Symbol::PS_L2:
+    case Symbol::PS_R2:
+    case Symbol::XB_LT:
+    case Symbol::XB_RT: {
+        QString text = (symbol == Symbol::PS_L2) ? QStringLiteral("L2") :
+                       (symbol == Symbol::PS_R2) ? QStringLiteral("R2") :
+                       (symbol == Symbol::XB_LT) ? QStringLiteral("LT") : QStringLiteral("RT");
+        p.setPen(colors.font);
+        SetTextFont(p, 5.0f);
+        p.drawText(QRectF(center.x() - 10, center.y() - 6, 20, 12), Qt::AlignCenter, text);
+        break;
+    }
     }
 }
 

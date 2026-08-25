@@ -432,6 +432,16 @@ void ConfigureSinglePlayer::UpdateLabelsForCurrentStyle() {
         }
     }
 
+    if (controller_frame) {
+        if (active_style == ControllerLayoutStyle::PlayStation) {
+            controller_frame->SetVisualLayoutStyle(PlayerControlPreview::VisualLayoutStyle::PlayStation);
+        } else if (active_style == ControllerLayoutStyle::Xbox || active_style == ControllerLayoutStyle::GenericPC) {
+            controller_frame->SetVisualLayoutStyle(PlayerControlPreview::VisualLayoutStyle::Xbox);
+        } else {
+            controller_frame->SetVisualLayoutStyle(PlayerControlPreview::VisualLayoutStyle::Nintendo);
+        }
+    }
+
     switch (active_style) {
     case ControllerLayoutStyle::PlayStation:
         lbl_face_a->setText(tr("Botón Inferior ( ✕ Cruz ):"));

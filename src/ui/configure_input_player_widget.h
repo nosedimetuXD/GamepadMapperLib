@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: Copyright 2025 Eden Emulator Project
+// SPDX-FileCopyrightText: Copyright 2025 Eden Emulator Project
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // SPDX-FileCopyrightText: Copyright 2020 yuzu Emulator Project
@@ -47,6 +47,14 @@ public:
     // Handles emulated controller events
     void ControllerUpdate(Core::HID::ControllerTriggerType type);
 
+    enum class VisualLayoutStyle {
+        Nintendo,
+        Xbox,
+        PlayStation,
+    };
+
+    void SetVisualLayoutStyle(VisualLayoutStyle style);
+
     // Updates input on scheduled interval
     void UpdateInput();
 
@@ -76,7 +84,17 @@ private:
         ZR,
         SR,
         Charging,
+        PS_Cross,
+        PS_Circle,
+        PS_Square,
+        PS_Triangle,
+        PS_L2,
+        PS_R2,
+        XB_LT,
+        XB_RT,
     };
+
+    VisualLayoutStyle visual_style{VisualLayoutStyle::Nintendo};
 
     struct ColorMapping {
         QColor outline{};
