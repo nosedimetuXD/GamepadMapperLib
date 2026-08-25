@@ -378,6 +378,9 @@ void ConfigureSinglePlayer::ConnectSignals() {
 }
 
 void ConfigureSinglePlayer::LoadConfiguration() {
+    if (emulated_controller) {
+        emulated_controller->ReloadFromSettings();
+    }
     UpdateInputDeviceCombobox();
     UpdateInputProfilesCombobox();
     UpdateLabelsForCurrentStyle();
@@ -385,9 +388,10 @@ void ConfigureSinglePlayer::LoadConfiguration() {
 }
 
 void ConfigureSinglePlayer::UpdateInputDeviceCombobox() {
+    combo_devices->blockSignals(true);
     combo_devices->clear();
-    combo_devices->addItem(tr("Cualquiera / Múltiples"));
-    combo_devices->addItem(tr("Sólo Teclado / Ratón"));
+    combo_devices->addItem(tr("Cualquiera / Múltiples"), QString{});
+    combo_devices->addItem(tr("Sólo Teclado / Ratón"), QString{});
 
     const auto devices = input_subsystem->GetInputDevices();
     for (const auto& device : devices) {
@@ -395,21 +399,55 @@ void ConfigureSinglePlayer::UpdateInputDeviceCombobox() {
                                QString::fromStdString(device.Serialize()));
     }
 
-    if (combo_devices->count() > 2) {
-        combo_devices->setCurrentIndex(2); // Seleccionar el primer mando detectado
-    } else {
-        combo_devices->setCurrentIndex(0);
+    int selected_idx = 0;
+    const auto mapped = emulated_controller ? emulated_controller->GetMappedDevices() : std::vector<Common::ParamPackage>{};
+    if (!mapped.empty()) {
+        const auto first_engine = mapped[0].Get("engine", "");
+        const auto first_guid = mapped[0].Get("guid", "");
+        const auto first_port = mapped[0].Get("port", 0);
+
+        if (first_engine == "keyboard" || first_engine == "mouse") {
+            selected_idx = 1;
+        } else {
+            for (int i = 2; i < combo_devices->count(); ++i) {
+                Common::ParamPackage dev_param{combo_devices->itemData(i).toString().toStdString()};
+                if (dev_param.Get("engine", "") == first_engine &&
+                    (dev_param.Get("guid", "") == first_guid || dev_param.Get("guid2", "") == first_guid) &&
+                    dev_param.Get("port", 0) == first_port) {
+                    selected_idx = i;
+                    break;
+                }
+            }
+            if (selected_idx == 0 && combo_devices->count() > 2) {
+                selected_idx = 2;
+            }
+        }
+    } else if (combo_devices->count() > 2) {
+        selected_idx = 2; // Seleccionar el primer mando físico conectado
     }
+
+    combo_devices->setCurrentIndex(selected_idx);
+    combo_devices->blockSignals(false);
 }
 
 void ConfigureSinglePlayer::UpdateInputProfilesCombobox() {
+    combo_profiles->blockSignals(true);
     combo_profiles->clear();
-    if (!profiles) return;
-
-    const auto profile_names = profiles->GetInputProfileNames();
-    for (const auto& name : profile_names) {
-        combo_profiles->addItem(QString::fromStdString(name));
+    if (profiles) {
+        const auto profile_names = profiles->GetInputProfileNames();
+        const auto& current_profile = Settings::values.players.GetValue()[0].profile_name;
+        int active_idx = -1;
+        for (std::size_t i = 0; i < profile_names.size(); ++i) {
+            combo_profiles->addItem(QString::fromStdString(profile_names[i]));
+            if (profile_names[i] == current_profile) {
+                active_idx = static_cast<int>(i);
+            }
+        }
+        if (active_idx >= 0) {
+            combo_profiles->setCurrentIndex(active_idx);
+        }
     }
+    combo_profiles->blockSignals(false);
 }
 
 void ConfigureSinglePlayer::SetLayoutStyle(ControllerLayoutStyle style) {
@@ -709,6 +747,11 @@ void ConfigureSinglePlayer::ApplyConfiguration() {
     if (emulated_controller) {
         emulated_controller->SaveCurrentConfig();
     }
+    if (combo_profiles && !combo_profiles->currentText().isEmpty()) {
+        Settings::values.players.GetValue()[0].profile_name = combo_profiles->currentText().toStdString();
+    }
+    QtConfig config;
+    config.SaveAllValues();
 }
 
 } // namespace GamepadMapper

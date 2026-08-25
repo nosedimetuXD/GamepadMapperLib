@@ -39,5 +39,7 @@ int main(int argc, char* argv[]) {
     GamepadMapper::SingleGamepadConfigDialog dialog;
     dialog.show();
 
-    return app.exec();
+    const int result = app.exec();
+    manager.Shutdown();
+    return result;
 }

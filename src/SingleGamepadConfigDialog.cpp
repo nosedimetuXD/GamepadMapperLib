@@ -3,6 +3,7 @@
 #include "GamepadMapper/GamepadManager.h"
 #include "ui/configure_single_player.h"
 #include "ui/input_profiles.h"
+#include "ui/qt_config.h"
 #include "core/hid_core/hid_core.h"
 #include "core/input_common/main.h"
 
@@ -73,6 +74,9 @@ void SingleGamepadConfigDialog::ApplyConfiguration() {
             hid_core->ReloadInputDevices();
         }
     }
+    // Persist to INI file on disk immediately
+    QtConfig config;
+    config.SaveAllValues();
 }
 
 void SingleGamepadConfigDialog::accept() {
