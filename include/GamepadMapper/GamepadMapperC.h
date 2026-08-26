@@ -128,6 +128,7 @@ GAMEPAD_API bool gamepad_load_profile(int player, const char* profile_name);
 // GUI Configuration
 GAMEPAD_API bool gamepad_show_config_dialog(void* parent_window);
 GAMEPAD_API bool gamepad_show_single_config_dialog(void* parent_window);
+GAMEPAD_API bool gamepad_show_single_switch_config_dialog(void* parent_window);
 
 #ifdef __cplusplus
 }

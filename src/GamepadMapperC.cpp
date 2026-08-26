@@ -3,6 +3,7 @@
 #include "GamepadMapper/GamepadManager.h"
 #include "GamepadMapper/GamepadConfigDialog.h"
 #include "GamepadMapper/SingleGamepadConfigDialog.h"
+#include "GamepadMapper/SingleSwitchConfigDialog.h"
 
 #include <QApplication>
 #include <QStyleFactory>
@@ -149,6 +150,12 @@ bool gamepad_show_config_dialog(void* parent_window) {
 bool gamepad_show_single_config_dialog(void* parent_window) {
     EnsureQtApp();
     GamepadMapper::SingleGamepadConfigDialog dialog(static_cast<QWidget*>(parent_window));
+    return dialog.exec() == QDialog::Accepted;
+}
+
+bool gamepad_show_single_switch_config_dialog(void* parent_window) {
+    EnsureQtApp();
+    GamepadMapper::SingleSwitchConfigDialog dialog(static_cast<QWidget*>(parent_window));
     return dialog.exec() == QDialog::Accepted;
 }
 

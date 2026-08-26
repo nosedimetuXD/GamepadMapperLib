@@ -2,6 +2,7 @@
 #include "GamepadMapper/GamepadManager.h"
 #include "GamepadMapper/GamepadConfigDialog.h"
 #include "GamepadMapper/SingleGamepadConfigDialog.h"
+#include "GamepadMapper/SingleSwitchConfigDialog.h"
 
 #include <chrono>
 #include <thread>
@@ -44,6 +45,7 @@ bool GamepadManager::Initialize() {
     impl->input_subsystem->Initialize();
 
     impl->hid_core = std::make_unique<Core::HID::HIDCore>();
+    impl->hid_core->SetSupportedStyleTag(Core::HID::NpadStyleTag{Core::HID::NpadStyleSet::All});
     impl->profiles = std::make_unique<InputProfiles>();
     impl->qt_config = std::make_unique<QtConfig>();
     impl->qt_config->ReloadAllValues();
@@ -310,6 +312,14 @@ bool GamepadManager::OpenSingleConfigDialog(void* parent_window) {
         Initialize();
     }
     SingleGamepadConfigDialog dialog(static_cast<QWidget*>(parent_window));
+    return dialog.exec() == QDialog::Accepted;
+}
+
+bool GamepadManager::OpenSingleSwitchConfigDialog(void* parent_window) {
+    if (!impl->initialized) {
+        Initialize();
+    }
+    SingleSwitchConfigDialog dialog(static_cast<QWidget*>(parent_window));
     return dialog.exec() == QDialog::Accepted;
 }
 

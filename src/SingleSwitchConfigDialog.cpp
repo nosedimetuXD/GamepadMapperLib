@@ -67,6 +67,7 @@ void SingleSwitchConfigDialog::ApplyConfiguration() {
     if (config_widget) {
         config_widget->ApplyConfiguration();
     }
+    QtConfig().SaveAllValues();
 }
 
 void SingleSwitchConfigDialog::accept() {

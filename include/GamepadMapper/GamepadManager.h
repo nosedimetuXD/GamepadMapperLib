@@ -70,6 +70,7 @@ public:
     /// Convenience helpers to open Qt config dialogs
     bool OpenConfigDialog(void* parent_window = nullptr);
     bool OpenSingleConfigDialog(void* parent_window = nullptr);
+    bool OpenSingleSwitchConfigDialog(void* parent_window = nullptr);
 
 private:
     GamepadManager();

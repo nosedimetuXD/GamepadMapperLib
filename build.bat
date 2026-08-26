@@ -122,6 +122,7 @@ if exist "..\gamepad_mapper.py" (
     echo [INFO] Desplegando binarios actualizados en la raiz del proyecto...
     if exist "build\GamepadMapper.dll" copy /y "build\GamepadMapper.dll" "..\GamepadMapper.dll" >nul 2>&1
     if exist "build\SingleGamepadMapperApp.exe" copy /y "build\SingleGamepadMapperApp.exe" "..\SingleGamepadMapperApp.exe" >nul 2>&1
+    if exist "build\SingleSwitchMapperApp.exe" copy /y "build\SingleSwitchMapperApp.exe" "..\SingleSwitchMapperApp.exe" >nul 2>&1
     if exist "build\GamepadMapperApp.exe" copy /y "build\GamepadMapperApp.exe" "..\GamepadMapperApp.exe" >nul 2>&1
     if exist "build\_deps\sdl3-build\SDL3.dll" copy /y "build\_deps\sdl3-build\SDL3.dll" "..\SDL3.dll" >nul 2>&1
 )

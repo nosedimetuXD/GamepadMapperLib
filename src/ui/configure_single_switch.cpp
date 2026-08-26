@@ -673,6 +673,7 @@ void ConfigureSingleSwitch::ApplyConfiguration() {
     if (emulated_controller) {
         emulated_controller->SaveCurrentConfig();
     }
+    QtConfig().SaveAllValues();
 }
 
 } // namespace GamepadMapper

@@ -570,6 +570,10 @@ void SDLDriver::CloseJoystick(SDL_Joystick* sdl_joystick) {
 void SDLDriver::PumpEvents() const {
     if (initialized) {
         SDL_PumpEvents();
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            // Ensures queue is drained and processed immediately
+        }
     }
 }
 
