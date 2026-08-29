@@ -14,6 +14,10 @@ static std::unique_ptr<QApplication> s_qt_app;
 
 static void EnsureQtApp() {
     if (!QApplication::instance()) {
+        QCoreApplication::addLibraryPath(QStringLiteral("C:/Qt/6.8.2/msvc2022_64/plugins"));
+        QCoreApplication::addLibraryPath(QStringLiteral("."));
+        QCoreApplication::addLibraryPath(QStringLiteral("plugins"));
+
         static int argc = 1;
         static char app_name[] = "GamepadMapperApp";
         static char* argv[] = { app_name, nullptr };
