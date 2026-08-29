@@ -1,9 +1,10 @@
-﻿// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 #pragma once
 
 #include <QWidget>
 #include <QTimer>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
 #include <QSlider>
@@ -78,6 +79,7 @@ private:
     ControllerLayoutStyle current_style{ControllerLayoutStyle::AutoDetect};
 
     // UI Widgets
+    QCheckBox* check_connected{nullptr};
     QComboBox* combo_devices{nullptr};
     QComboBox* combo_styles{nullptr};
     QComboBox* combo_profiles{nullptr};

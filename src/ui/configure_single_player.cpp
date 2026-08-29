@@ -96,11 +96,15 @@ void ConfigureSinglePlayer::SetupLayout() {
     auto* top_group = new QGroupBox(tr("Dispositivo y Perfiles"), this);
     auto* top_layout = new QGridLayout(top_group);
 
-    top_layout->addWidget(new QLabel(tr("Mando / Dispositivo:"), this), 0, 0);
-    combo_devices = new QComboBox(this);
-    top_layout->addWidget(combo_devices, 0, 1);
+    check_connected = new QCheckBox(tr("Conectar Controlador"), this);
+    check_connected->setChecked(true);
+    top_layout->addWidget(check_connected, 0, 0);
 
-    top_layout->addWidget(new QLabel(tr("Estilo de Botones:"), this), 0, 2);
+    top_layout->addWidget(new QLabel(tr("Mando / Dispositivo:"), this), 0, 1);
+    combo_devices = new QComboBox(this);
+    top_layout->addWidget(combo_devices, 0, 2);
+
+    top_layout->addWidget(new QLabel(tr("Estilo de Botones:"), this), 0, 3);
     combo_styles = new QComboBox(this);
     combo_styles->addItem(tr("Auto-Detectar"), static_cast<int>(ControllerLayoutStyle::AutoDetect));
     combo_styles->addItem(tr("Xbox (A/B/X/Y - LB/RB - LT/RT)"), static_cast<int>(ControllerLayoutStyle::Xbox));
@@ -108,11 +112,11 @@ void ConfigureSinglePlayer::SetupLayout() {
     combo_styles->addItem(tr("Nintendo (B/A/Y/X - L/R - ZL/ZR)"), static_cast<int>(ControllerLayoutStyle::Nintendo));
     combo_styles->addItem(tr("PC / Genérico"), static_cast<int>(ControllerLayoutStyle::GenericPC));
     combo_styles->setCurrentIndex(static_cast<int>(current_style));
-    top_layout->addWidget(combo_styles, 0, 3);
+    top_layout->addWidget(combo_styles, 0, 4);
 
     top_layout->addWidget(new QLabel(tr("Perfil:"), this), 1, 0);
     combo_profiles = new QComboBox(this);
-    top_layout->addWidget(combo_profiles, 1, 1);
+    top_layout->addWidget(combo_profiles, 1, 1, 1, 2);
 
     auto* profile_btn_layout = new QHBoxLayout();
     btn_profile_save = new QPushButton(tr("Guardar"), this);
@@ -121,7 +125,7 @@ void ConfigureSinglePlayer::SetupLayout() {
     profile_btn_layout->addWidget(btn_profile_save);
     profile_btn_layout->addWidget(btn_profile_new);
     profile_btn_layout->addWidget(btn_profile_delete);
-    top_layout->addLayout(profile_btn_layout, 1, 2, 1, 2);
+    top_layout->addLayout(profile_btn_layout, 1, 3, 1, 2);
 
     main_layout->addWidget(top_group);
 
@@ -305,6 +309,11 @@ void ConfigureSinglePlayer::ConnectSignals() {
         input_subsystem->PumpEvents();
     });
 
+    connect(check_connected, &QCheckBox::toggled, this, [this](bool checked) {
+        if (emulated_controller) {
+            emulated_controller->Connect(checked);
+        }
+    });
     connect(combo_devices, qOverload<int>(&QComboBox::activated), this, &ConfigureSinglePlayer::OnDeviceChanged);
     connect(combo_styles, qOverload<int>(&QComboBox::currentIndexChanged), this, &ConfigureSinglePlayer::OnStyleChanged);
     connect(btn_profile_new, &QPushButton::clicked, this, &ConfigureSinglePlayer::OnNewProfile);
@@ -380,6 +389,9 @@ void ConfigureSinglePlayer::ConnectSignals() {
 void ConfigureSinglePlayer::LoadConfiguration() {
     if (emulated_controller) {
         emulated_controller->ReloadFromSettings();
+        if (check_connected) {
+            check_connected->setChecked(emulated_controller->IsConnected(true));
+        }
     }
     UpdateInputDeviceCombobox();
     UpdateInputProfilesCombobox();
@@ -745,6 +757,9 @@ void ConfigureSinglePlayer::ClearAll() {
 
 void ConfigureSinglePlayer::ApplyConfiguration() {
     if (emulated_controller) {
+        if (check_connected) {
+            emulated_controller->Connect(check_connected->isChecked());
+        }
         emulated_controller->SaveCurrentConfig();
     }
     if (combo_profiles && !combo_profiles->currentText().isEmpty()) {

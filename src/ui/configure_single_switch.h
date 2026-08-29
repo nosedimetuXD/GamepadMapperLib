@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
 #include <QGroupBox>
@@ -72,6 +73,7 @@ private:
     std::optional<std::function<void(const Common::ParamPackage&)>> input_setter;
 
     // UI Top Bar Controls
+    QCheckBox* check_connected{nullptr};
     QComboBox* combo_devices{nullptr};
     QComboBox* combo_controller_type{nullptr};
     QComboBox* combo_profiles{nullptr};

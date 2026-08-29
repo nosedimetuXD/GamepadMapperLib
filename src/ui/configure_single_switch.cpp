@@ -95,11 +95,15 @@ void ConfigureSingleSwitch::SetupLayout() {
     auto* top_group = new QGroupBox(tr("Configuración de Mando de Nintendo Switch y Perfiles"), this);
     auto* top_layout = new QGridLayout(top_group);
 
-    top_layout->addWidget(new QLabel(tr("Mando Físico / Entrada:"), this), 0, 0);
-    combo_devices = new QComboBox(this);
-    top_layout->addWidget(combo_devices, 0, 1);
+    check_connected = new QCheckBox(tr("Conectar Controlador"), this);
+    check_connected->setChecked(true);
+    top_layout->addWidget(check_connected, 0, 0);
 
-    top_layout->addWidget(new QLabel(tr("Tipo de Mando Switch:"), this), 0, 2);
+    top_layout->addWidget(new QLabel(tr("Mando Físico / Entrada:"), this), 0, 1);
+    combo_devices = new QComboBox(this);
+    top_layout->addWidget(combo_devices, 0, 2);
+
+    top_layout->addWidget(new QLabel(tr("Tipo de Mando Switch:"), this), 0, 3);
     combo_controller_type = new QComboBox(this);
     combo_controller_type->addItem(tr("Nintendo Switch Pro Controller"), static_cast<int>(Core::HID::NpadStyleIndex::Fullkey));
     combo_controller_type->addItem(tr("Joy-Con Duales"), static_cast<int>(Core::HID::NpadStyleIndex::JoyconDual));
@@ -107,11 +111,11 @@ void ConfigureSingleSwitch::SetupLayout() {
     combo_controller_type->addItem(tr("Joy-Con Derecho"), static_cast<int>(Core::HID::NpadStyleIndex::JoyconRight));
     combo_controller_type->addItem(tr("Mando de GameCube"), static_cast<int>(Core::HID::NpadStyleIndex::GameCube));
     combo_controller_type->addItem(tr("Modo Portátil (Handheld)"), static_cast<int>(Core::HID::NpadStyleIndex::Handheld));
-    top_layout->addWidget(combo_controller_type, 0, 3);
+    top_layout->addWidget(combo_controller_type, 0, 4);
 
     top_layout->addWidget(new QLabel(tr("Perfil:"), this), 1, 0);
     combo_profiles = new QComboBox(this);
-    top_layout->addWidget(combo_profiles, 1, 1);
+    top_layout->addWidget(combo_profiles, 1, 1, 1, 2);
 
     btn_save_profile = new QPushButton(tr("Guardar"), this);
     btn_new_profile = new QPushButton(tr("Nuevo"), this);
@@ -121,7 +125,7 @@ void ConfigureSingleSwitch::SetupLayout() {
     profile_btn_layout->addWidget(btn_save_profile);
     profile_btn_layout->addWidget(btn_new_profile);
     profile_btn_layout->addWidget(btn_delete_profile);
-    top_layout->addLayout(profile_btn_layout, 1, 2, 1, 2);
+    top_layout->addLayout(profile_btn_layout, 1, 3, 1, 2);
 
     main_layout->addWidget(top_group);
 
@@ -294,6 +298,11 @@ void ConfigureSingleSwitch::SetupLayout() {
 }
 
 void ConfigureSingleSwitch::ConnectSignals() {
+    connect(check_connected, &QCheckBox::toggled, this, [this](bool checked) {
+        if (emulated_controller) {
+            emulated_controller->Connect(checked);
+        }
+    });
     connect(combo_devices, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &ConfigureSingleSwitch::OnDeviceChanged);
     connect(combo_controller_type, qOverload<int>(&QComboBox::currentIndexChanged),
@@ -387,6 +396,9 @@ void ConfigureSingleSwitch::ConnectSignals() {
 }
 
 void ConfigureSingleSwitch::LoadConfiguration() {
+    if (emulated_controller && check_connected) {
+        check_connected->setChecked(emulated_controller->IsConnected(true));
+    }
     UpdateInputDeviceCombobox();
     UpdateInputProfilesCombobox();
     UpdateButtonTextLabels();
@@ -671,6 +683,9 @@ void ConfigureSingleSwitch::ClearMappings() {
 
 void ConfigureSingleSwitch::ApplyConfiguration() {
     if (emulated_controller) {
+        if (check_connected) {
+            emulated_controller->Connect(check_connected->isChecked());
+        }
         emulated_controller->SaveCurrentConfig();
     }
     QtConfig().SaveAllValues();
