@@ -52,6 +52,36 @@ bool GamepadManager::Initialize() {
 
     impl->hid_core->ReloadInputDevices();
 
+    // Auto-bind first physical gamepad if player 0 has default keyboard mapping
+    auto& player0_settings = Settings::values.players.GetValue()[0];
+    bool has_gamepad_mapping = false;
+    for (const auto& btn_str : player0_settings.buttons) {
+        if (!btn_str.empty() && btn_str.find("engine:keyboard") == std::string::npos && btn_str.find("engine:mouse") == std::string::npos) {
+            has_gamepad_mapping = true;
+            break;
+        }
+    }
+
+    if (!has_gamepad_mapping) {
+        const auto devices = impl->input_subsystem->GetInputDevices();
+        if (!devices.empty()) {
+            const auto& dev = devices[0];
+            auto controller0 = impl->hid_core->GetEmulatedController(Core::HID::NpadIdType::Player1);
+            if (controller0) {
+                controller0->Connect(true);
+                const auto button_mappings = impl->input_subsystem->GetButtonMappingForDevice(dev);
+                for (const auto& [btn_id, mapping_param] : button_mappings) {
+                    controller0->SetButtonParam(btn_id, mapping_param);
+                }
+                const auto analog_mappings = impl->input_subsystem->GetAnalogMappingForDevice(dev);
+                for (const auto& [analog_id, mapping_param] : analog_mappings) {
+                    controller0->SetStickParam(analog_id, mapping_param);
+                }
+                impl->qt_config->SaveAllValues();
+            }
+        }
+    }
+
     impl->initialized = true;
     return true;
 }
